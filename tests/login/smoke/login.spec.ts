@@ -1,8 +1,5 @@
 import { expect, tags, test } from '../../../fixtures';
 
-test.beforeEach(async ({ app }) => {
-    app.context.clearCookies();
-});
 
 test(
     'check login screen loading',

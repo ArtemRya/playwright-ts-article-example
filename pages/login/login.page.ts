@@ -3,7 +3,6 @@ import { PageBase } from '../base/page.base';
 import { locators, onLoadLocators } from './login.locators';
 
 export class LoginPage extends PageBase {
-    readonly url = './vue-element-admin/#/login';
     readonly onLoadLocators: Record<string, Locator>;
     readonly locators: Record<string, Locator>;
 
@@ -19,18 +18,4 @@ export class LoginPage extends PageBase {
         await this.locators.loginButton.click();
     }
 
-    async changeLanguage(language: '中文' | 'English' | 'Español' | '日本語') {
-        await this.locators.languagesButton.click();
-        await this.locators.languageList.waitFor({ state: 'visible' });
-        await this.locators.languageList
-            .getByText(language)
-            .waitFor({ state: 'visible' });
-        const isEnabled = await this.locators.languageList
-            .getByText(language)
-            .isEnabled();
-        if (isEnabled) {
-            await this.locators.languageList.getByText(language).click();
-        }
-        await this.page.mouse.click(10, 10);
-    }
 }

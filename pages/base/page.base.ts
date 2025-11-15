@@ -6,16 +6,10 @@ import { IComponentBase } from '../common/base/component.base';
  */
 export interface IPageBase {
     readonly page: Page;
-    readonly url: string;
     readonly onLoadLocators: Record<string, Locator>;
     readonly locators: Record<string, Locator>;
 
     waitLoadingLocators(timeout?: number): Promise<void>;
-
-    goto(): Promise<void>;
-    goto(checkVisibility: boolean): Promise<void>;
-    goto(id: string, checkVisibility?: boolean): Promise<void>;
-    goto(id: string, suffix: string, checkVisibility?: boolean): Promise<void>;
 }
 
 /**
@@ -24,7 +18,6 @@ export interface IPageBase {
  */
 export abstract class PageBase implements IPageBase {
     readonly page: Page;
-    abstract readonly url: string;
     abstract readonly onLoadLocators: Record<string, Locator>;
     abstract readonly locators: Record<string, Locator>;
     private dynamicPath: string = '';
@@ -71,77 +64,6 @@ export abstract class PageBase implements IPageBase {
             (acc, component) => ({ ...acc, ...component.onLoadLocators }),
             baseLocators,
         );
-    }
-
-    /**
-     * Sets a dynamic path segment for the URL.
-     * @param path - Path segment to append to the base URL
-     */
-    protected setDynamicPath(path: string): void {
-        this.dynamicPath = path;
-    }
-
-    /**
-     * Gets the complete URL including any dynamic path segments.
-     * @returns Full URL string
-     */
-    protected getFullUrl(): string {
-        return this.dynamicPath ? `${this.url}/${this.dynamicPath}` : this.url;
-    }
-
-    /**
-     * Navigate to the page
-     */
-    async goto(): Promise<void>;
-    /**
-     * Navigate to the page with option to wait for loading locators
-     * @param checkVisibility - Whether to wait for loading locators
-     */
-    async goto(checkVisibility: boolean): Promise<void>;
-    /**
-     * Navigate to the page with a specific ID
-     * @param id - The ID to append to the URL
-     * @param checkVisibility - Whether to wait for loading locators
-     */
-    async goto(id: string, checkVisibility?: boolean): Promise<void>;
-    /**
-     * Navigate to the page with an ID and suffix
-     * @param id - The ID to append to the URL
-     * @param suffix - Additional path segment to append after the ID
-     * @param checkVisibility - Whether to wait for loading locators
-     */
-    async goto(
-        id: string,
-        suffix: string,
-        checkVisibility?: boolean,
-    ): Promise<void>;
-    async goto(
-        idOrCheck?: string | boolean,
-        suffixOrCheck?: string | boolean,
-        check?: boolean,
-    ): Promise<void> {
-        const checkVisibility =
-            typeof idOrCheck === 'boolean'
-                ? idOrCheck
-                : typeof suffixOrCheck === 'boolean'
-                ? suffixOrCheck
-                : check ?? false;
-
-        const path =
-            typeof idOrCheck === 'string'
-                ? typeof suffixOrCheck === 'string'
-                    ? `${idOrCheck}/${suffixOrCheck}`
-                    : idOrCheck
-                : '';
-
-        if (path) {
-            this.setDynamicPath(path);
-        }
-
-        await this.page.goto(this.getFullUrl());
-        if (checkVisibility) {
-            await this.waitLoadingLocators();
-        }
     }
 
     /**
